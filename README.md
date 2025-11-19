@@ -27,10 +27,14 @@
 - Notes
 
 ## 요구 사항
+```bash
 pandas  
 anthropic  
-openai 
+openai
+```
+```
 pip install -r requirements.txt
+```
 
 ## 프로젝트 구조
     ├─ main.py                   # 핵심 스크립트
@@ -41,41 +45,52 @@ pip install -r requirements.txt
         └─ extracted_data.csv     # 최종 통합된 데이터셋
 
 ## 주요 구성요소
-extract_data(model, text, property_name, definition, doi)
-주어진 텍스트와 LLM을 사용해 마크다운 형식의 표로 데이터 추출
+- **`extract_data(model, text, property_name, definition, doi)`**
+ 
+  주어진 텍스트와 LLM을 사용해 마크다운 형식의 표로 데이터 추출
+  
 
-compare_results(...)
-두 모델 결과를 비교 → Match Level 및 Reliability 산출 → 최종 데이터 선택
+- **`compare_results(...)`**
+  
+  두 모델 결과를 비교 → Match Level 및 Reliability 산출 → 최종 데이터 선택
+  
 
-parse_table(table_string, source)
-표 문자열을 구조화된 데이터 레코드로 파싱
+- **`parse_table(table_string, source)`**
+  
+  표 문자열을 구조화된 데이터 레코드로 파싱
 
-update_dataframe(new_data)
-데이터프레임 갱신 및 CSV 저장
+- **`update_dataframe(new_data)`**
+  
+  데이터프레임 갱신 및 CSV 저장
 
-process_all_files_in_folder(folder_path, property_name, definition, preferred_model='gpt')
-폴더 내 .txt 파일을 재귀 탐색하여 전체 자동 처리
+- **`process_all_files_in_folder(folder_path, property_name, definition, preferred_model='gpt')`**
+  
+  폴더 내 .txt 파일을 재귀 탐색하여 전체 자동 처리 
 
+  
 ## 사용 방법
 1. API 키 설정
 
+```bash
 from anthropic import Anthropic  
 import openai  
 anthropic = Anthropic(api_key="YOUR_ANTHROPIC_API_KEY")  
 openai.api_key = "YOUR_OPENAI_API_KEY"
+```
 2. 텍스트 파일 준비
-‑ 논문 본문 또는 섹션을 .txt로 저장
-‑ DOI 등을 별도로 관리
+   - 논문 본문 또는 섹션을 .txt로 저장
+   - DOI 등을 별도로 관리
 
-3. 실행
+4. 실행
 
+```
 folder_path = "data"  
 process_all_files_in_folder(folder_path, property_name, definition)
+```
+
 4. 결과 확인
-
-- output/extracted_data.csv 파일 생성
-
-- 머신러닝 회귀 모델의 입력 데이터로 즉시 활용 가능
+   - output/extracted_data.csv 파일 생성
+   - 머신러닝 회귀 모델의 입력 데이터로 즉시 활용 가능
 
 ## 주의 및 확장사항
 - PDF → 텍스트 변환 기능은 포함되어 있지 않습니다

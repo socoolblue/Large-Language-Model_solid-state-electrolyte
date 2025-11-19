@@ -13,35 +13,23 @@
 
 ## 추출 항목
 - section
-
 - chemical composition
-
 - source (DOI)
-
 - exp / calc
-
 - temperature / temp_unit
-
 - conductivity / unit
-
 - activation e
-
 - structure type
-
 - chemical family
-
 - mobile ion
-
 - Match Level
-
 - Reliability
-
 - Notes
 
 ## 요구 사항
 pandas  
 anthropic  
-openai  
+openai 
 pip install -r requirements.txt
 
 ## 프로젝트 구조

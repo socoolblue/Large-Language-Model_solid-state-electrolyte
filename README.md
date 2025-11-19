@@ -1,123 +1,101 @@
-# Ionic Conductivity Data Extractor
+# Ionic Conductivity Data Extraction Pipeline
+고체 전해질(solid‑state electrolyte) 논문 텍스트(.txt)에서 이온전도도(Ionic Conductivity) 관련 데이터를 자동 추출하고,
+두 개의 대형 언어모델(LLM)을 사용해 결과를 비교‧정제 후 머신러닝 학습용 CSV로 저장하는 파이프라인입니다.
 
-Automated Data Extraction & Harmonization Tool using GPT / Claude
+## 기능 개요
+논문 텍스트에서 물질 조성, 온도, 전도도 등 핵심 정보를 자동으로 추출
 
-이 프로젝트는 과학 논문 텍스트(.txt)에서 이온전도도(Ionic Conductivity) 관련 데이터를 자동으로 추출하여,
-Deep Learning 회귀 모델 학습에 바로 사용할 수 있는 통합 CSV 데이터셋을 생성하는 Python 기반 도구입니다.
+GPT(OpenAI)와 Claude(Anthropic)의 결과를 병합
 
-Claude와 GPT 두 모델의 결과를 비교하여 정확성, 신뢰도, 일치도를 자동 평가하고,
-가장 적합한 최종 데이터를 선택하여 하나의 표준화된 형태로 저장합니다.
+수치 정규화 및 누락값 처리로 머신러닝 준비 완료된 데이터셋 생성
 
-## 주요 기능 (Features)
-### 1. 논문 텍스트 분석 및 데이터 추출
+지정된 폴더 내다 .txt 파일을 한꺼번에 처리하는 배치 모드 지원
 
-Claude / GPT 모두로 동일한 텍스트를 분석하여
+## 추출 항목
+section
 
-구조 타입
+chemical composition
 
-화학조성
+source (DOI)
 
-온도
+exp / calc
 
-단위
+temperature / temp_unit
 
-이온전도도
+conductivity / unit
 
-활성화 에너지
+activation e
 
-화학 패밀리
+structure type
 
-이동 이온 종류
-등 실험 데이터 추출 및 정리
+chemical family
 
-### 2. 두 모델 결과 비교 및 자동 정합(Matching)
+mobile ion
 
-Exact / Semantic / Partial / Mismatch / Missing
+Match Level
 
-모델 간 비교를 통해 가장 정확한 Final Value 선택
+Reliability
 
-신뢰도(High/Medium/Low) 자동 표시
+Notes
 
-### 3. 딥러닝 입력용 표준 포맷 생성
+## 요구 사항
+pandas  
+anthropic  
+openai  
+pip install -r requirements.txt
 
-최종 CSV 컬럼:
+## 프로젝트 구조
+.
+├─ main.py                   # 핵심 스크립트
+├─ README.md
+├─ requirements.txt
+├─ data/                    # 입력 .txt 파일 모음
+└─ output/
+   └─ extracted_data.csv     # 최종 통합된 데이터셋
 
-section, chemical composition, source, exp. calc, temperature, temp_unit,
-conductivity, unit, activation e, structure type, chemical family,
-mobile ion, Match Level, Reliability, Notes
+## 주요 구성요소
+extract_data(model, text, property_name, definition, doi)
+주어진 텍스트와 LLM을 사용해 마크다운 형식의 표로 데이터 추출
 
-### 4. 폴더 내 모든 .txt 파일 자동 처리
+compare_results(...)
+두 모델 결과를 비교 → Match Level 및 Reliability 산출 → 최종 데이터 선택
 
-여러 논문 section 파일을 한 번에 처리
+parse_table(table_string, source)
+표 문자열을 구조화된 데이터 레코드로 파싱
 
-통합 CSV(추출된 파일.csv)로 저장
+update_dataframe(new_data)
+데이터프레임 갱신 및 CSV 저장
 
-## 설치 및 환경 설정 (Installation)
-1. 저장소 클론
-git clone https://github.com/yourname/repo-name.git
-cd repo-name
+process_all_files_in_folder(folder_path, property_name, definition, preferred_model='gpt')
+폴더 내 .txt 파일을 재귀 탐색하여 전체 자동 처리
 
-2. 필요한 라이브러리 설치
-pip install pandas openai anthropic
+## 사용 방법
+API 키 설정
 
-3. API 키 설정
+from anthropic import Anthropic  
+import openai  
+anthropic = Anthropic(api_key="YOUR_ANTHROPIC_API_KEY")  
+openai.api_key = "YOUR_OPENAI_API_KEY"
+텍스트 파일 준비
+‑ 논문 본문 또는 섹션을 .txt로 저장
+‑ DOI 등을 별도로 관리
 
-코드 내 다음 부분을 실제 키로 교체:
+실행
 
-anthropic = Anthropic(api_key='YOUR_CLAUDE_API_KEY')
-openai.api_key = 'YOUR_OPENAI_API_KEY'
+folder_path = "data"  
+process_all_files_in_folder(folder_path, property_name, definition)
+결과 확인
 
+output/extracted_data.csv 파일 생성
 
-보안을 위해 환경변수 사용을 권장합니다:
+머신러닝 회귀 모델의 입력 데이터로 즉시 활용 가능
 
-export ANTHROPIC_API_KEY="..."
-export OPENAI_API_KEY="..."
+## 주의 및 확장사항
+PDF → 텍스트 변환 기능은 포함되어 있지 않습니다
 
-## 실행 방법 (Usage)
-1. 논문 section 텍스트(.txt) 파일 준비
+LLM 출력 포맷 변동 시 파싱 오류가 발생할 수 있으므로 예외처리 권장
 
-폴더 구조 예시:
+추후 구조 정보(격자 상수, 공간군 등)를 추가 피처로 적용 가능
 
-/paper_sections
-    /2025_01/
-        section1.txt
-        section2.txt
-    /2025_02/
-        ...
-
-2. 코드에서 폴더 경로 지정
-folder_path = "path/to/paper_sections"
-
-3. 전체 파일 자동 처리 실행
-python main.py
-
-4. 출력 파일
-
-프로젝트 폴더 내에 다음 CSV 생성:
-
-추출된 파일.csv
-
-## 데이터 처리 파이프라인
-flowchart TD
-A[Input: Paper Section (.txt)] --> B[Claude Extraction]
-A --> C[GPT Extraction]
-
-B --> D[Result Comparison]
-C --> D
-
-D --> E[Final Standardized Table Row]
-E --> F[Append to Global DataFrame]
-F --> G[Output CSV File]
-
-## 출력 형식 예시
-section	chemical composition	source	exp. calc	temperature	temp_unit	conductivity	unit	activation e	structure type	chemical family	mobile ion	Match Level	Reliability	Notes
-Results (text)	Li₇P₃S₁₁	10.1234/abcd.2025	exp	25	°C	1.2e-3	S/cm	0.32	Glass-Ceramic	Thiophosphate	Li⁺	Exact Match	High	-
-## 주의사항
-
-GPT/Claude 응답 토큰 수에 따라 분석 범위가 제한될 수 있습니다.
-
-너무 긴 section은 잘라서 넣는 것이 좋습니다.
-
-논문 PDF를 직접 업로드하는 기능은 포함되어 있지 않습니다.
-
-"추출된 파일.csv" 내에서 conductivity가 "No data" 또는 "N/A"인 항목은 자동 제외됩니다.
+## 라이선스
+필요시 MIT License 등으로 오픈소스화 가능합니다.

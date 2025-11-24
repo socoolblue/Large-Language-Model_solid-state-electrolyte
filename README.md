@@ -1,6 +1,6 @@
 # Ionic Conductivity Data Extraction Pipeline
 고체 전해질(solid‑state electrolyte) 논문 텍스트(.txt)에서 이온전도도(Ionic Conductivity) 관련 데이터를 자동 추출하고,
-두 개의 대형 언어모델(LLM)을 사용해 결과를 비교‧정제 후 머신러닝 학습용 CSV로 저장하는 파이프라인입니다.
+두 개의 대형 언어모델(LLM)을 사용해 결과를 비교‧정제 후 머신러닝 학습용 CSV로 저장하는 파이프라인입니다. 
 
 ## 기능 개요
 - 논문 텍스트에서 물질 조성, 온도, 전도도 등 핵심 정보를 자동으로 추출

@@ -1,103 +1,78 @@
-# Ionic Conductivity Data Extraction Pipeline
-고체 전해질(solid‑state electrolyte) 논문 텍스트(.txt)에서 이온전도도(Ionic Conductivity) 관련 데이터를 자동 추출하고,
-두 개의 대형 언어모델(LLM)을 사용해 결과를 비교‧정제 후 머신러닝 학습용 CSV로 저장하는 파이프라인입니다. 
+# 6-Fold Cross Validation for Regression Models
 
-## 기능 개요
-- 논문 텍스트에서 물질 조성, 온도, 전도도 등 핵심 정보를 자동으로 추출
+### Lasso Regression & PLS Regression Evaluation Notebook
 
-- GPT(OpenAI)와 Claude(Anthropic)의 결과를 병합
+이 저장소는 회귀 모델(Lasso Regression, PLSRegression)의 6-Fold Cross Validation 실험을 수행하고 모델 성능(R², MSE)을 평가하는 Jupyter Notebook을 포함합니다.
+Notebook 기반으로 모델의 일반화 성능을 분석하고 비교하는 데 목적이 있습니다.
 
-- 수치 정규화 및 누락값 처리로 머신러닝 준비 완료된 데이터셋 생성
+ ## 주요 기능 (Features)
 
-- 지정된 폴더 내다 .txt 파일을 한꺼번에 처리하는 배치 모드 지원
+6-Fold Cross Validation 수행
 
-## 추출 항목
-- section
-- chemical composition
-- source (DOI)
-- exp / calc
-- temperature / temp_unit
-- conductivity / unit
-- activation e
-- structure type
-- chemical family
-- mobile ion
-- Match Level
-- Reliability
-- Notes
+Lasso Regression 모델 학습 및 검증
 
-## 요구 사항
-```bash
-pandas  
-anthropic  
-openai
+PLSRegression 모델 학습 및 검증
+
+Fold별 R², MSE 계산
+
+평균 성능 지표 산출
+
+학습 및 검증 결과 시각화
+
+## 파일 구성
+bash
 ```
-```
-pip install -r requirements.txt
+ project/
+│
+├── 6-Fold Cross Validation.ipynb
+└── README.md
 ```
 
-## 프로젝트 구조
-    ├─ main.py                   # 핵심 스크립트
-    ├─ README.md
-    ├─ requirements.txt
-    ├─ data/                    # 입력 .txt 파일 모음
-    └─ output/
-        └─ extracted_data.csv     # 최종 통합된 데이터셋
-
-## 주요 구성요소
-- **`extract_data(model, text, property_name, definition, doi)`**
- 
-  주어진 텍스트와 LLM을 사용해 마크다운 형식의 표로 데이터 추출
-  
-
-- **`compare_results(...)`**
-  
-  두 모델 결과를 비교 → Match Level 및 Reliability 산출 → 최종 데이터 선택
-  
-
-- **`parse_table(table_string, source)`**
-  
-  표 문자열을 구조화된 데이터 레코드로 파싱
-
-- **`update_dataframe(new_data)`**
-  
-  데이터프레임 갱신 및 CSV 저장
-
-- **`process_all_files_in_folder(folder_path, property_name, definition, preferred_model='gpt')`**
-  
-  폴더 내 .txt 파일을 재귀 탐색하여 전체 자동 처리 
-
-  
-## 사용 방법
-1. API 키 설정
-
-```bash
-from anthropic import Anthropic  
-import openai  
-anthropic = Anthropic(api_key="YOUR_ANTHROPIC_API_KEY")  
-openai.api_key = "YOUR_OPENAI_API_KEY"
+## 설치 및 환경 설정
+필수 라이브러리 설치
 ```
-2. 텍스트 파일 준비
-   - 논문 본문 또는 섹션을 .txt로 저장
-   - DOI 등을 별도로 관리
-
-4. 실행
-
-```
-folder_path = "data"  
-process_all_files_in_folder(folder_path, property_name, definition)
+pip install numpy scikit-learn matplotlib
 ```
 
-4. 결과 확인
-   - output/extracted_data.csv 파일 생성
-   - 머신러닝 회귀 모델의 입력 데이터로 즉시 활용 가능
+## 실행 방법
 
-## 주의 및 확장사항
-- PDF → 텍스트 변환 기능은 포함되어 있지 않습니다
+1. 저장소 클론
+```
+git clone https://github.com/yourname/repo
+cd repo
+```
 
-- LLM 출력 포맷 변동 시 파싱 오류가 발생할 수 있으므로 예외처리 권장
+2. Notebook 실행
+```
+jupyter notebook
+```
 
-- 추후 구조 정보(격자 상수, 공간군 등)를 추가 피처로 적용 가능
+3. 6-Fold Cross Validation.ipynb 오픈 후 셀을 순차적으로 실행
+
+4. 결과로 각 Fold의 성능과 평균 R², MSE가 출력됨
+
+## 출력 지표
+
+Notebook에서는 아래와 같은 최종 평균 성능 지표를 제공합니다:
+
+- MSE_train_mean
+
+- R2_train_mean
+
+- MSE_val_mean
+
+- R2_val_mean
+
+
+## 모델 평가 흐름
+```
+flowchart TD
+A[Load Data] --> B[Create 6 Folds]
+B --> C[Train Model per Fold]
+C --> D[Predict Train/Validation]
+D --> E[Calculate R² & MSE]
+E --> F[Aggregate Results]
+F --> G[Output Mean Metrics]
+```
 
 ## 라이선스
-필요시 MIT License 등으로 오픈소스화 가능합니다.
